@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cipta E-Kad Raya Anda</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Lora:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body { background: #f8f5f0; font-family: 'Lora', serif; }
+    .ekad-form { max-width: 420px; margin: 2.5rem auto; background: #fff; border-radius: 1.2rem; box-shadow: 0 4px 24px 0 rgba(27,67,50,0.10); border: 2px solid #cfb53b; padding: 2rem 1.2rem; }
+    .theme-sample { display: flex; gap: 1rem; margin-bottom: 1rem; }
+    .theme-box { width: 48px; height: 48px; border-radius: 0.7rem; border: 2px solid #cfb53b; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: border 0.2s; }
+    .theme-box.selected { border: 3px solid #1b4332; }
+    .theme1 { background: #f8f5f0; }
+    .theme2 { background: #e0f7fa; }
+    .theme3 { background: #fffbe6; }
+    .preview-img { width: 100%; max-width: 180px; border-radius: 1rem; border: 2px solid #cfb53b; margin: 0.5rem 0; }
+  </style>
+</head>
+<body>
+  <div class="ekad-form">
+    <h2 class="mb-3" style="font-family:'Great Vibes',cursive;color:#1b4332;text-align:center;">Cipta E-Kad Raya Anda</h2>
+    <form id="ekadForm" enctype="multipart/form-data">
+      <div class="mb-3">
+        <label class="form-label" style="color:#1b4332;font-weight:bold;">Pilih Tema:</label>
+        <div class="theme-sample">
+          <div class="theme-box theme1 selected" data-theme="theme1"></div>
+          <div class="theme-box theme2" data-theme="theme2"></div>
+          <div class="theme-box theme3" data-theme="theme3"></div>
+        </div>
+        <input type="hidden" name="theme" id="themeInput" value="theme1">
+      </div>
+      <div class="mb-3">
+        <label class="form-label" style="color:#1b4332;font-weight:bold;">Muat Naik Foto Keluarga:</label>
+        <input type="file" class="form-control" name="photo" id="photoInput" accept="image/*" required>
+        <img id="previewImg" class="preview-img d-none" alt="Preview">
+      </div>
+      <div class="mb-3">
+        <label class="form-label" style="color:#1b4332;font-weight:bold;">Ucapan Raya:</label>
+        <textarea class="form-control" name="wish" id="wishInput" rows="2" maxlength="200" required placeholder="Contoh: Selamat Hari Raya! Maaf zahir & batin."></textarea>
+      </div>
+      <div class="mb-3">
+        <label class="form-label" style="color:#1b4332;font-weight:bold;">Nama Keluarga:</label>
+        <input type="text" class="form-control" name="signature" id="signatureInput" maxlength="100" required placeholder="Contoh: Ahmad, Aminah & Anak-anak">
+      </div>
+      <button type="submit" class="btn btn-success w-100" style="background:#1b4332;border:none;">Cipta Kad</button>
+    </form>
+    <div id="result" class="mt-3"></div>
+  </div>
+  <script>
+    // Theme selection
+    document.querySelectorAll('.theme-box').forEach(function(box) {
+      box.addEventListener('click', function() {
+        document.querySelectorAll('.theme-box').forEach(b=>b.classList.remove('selected'));
+        box.classList.add('selected');
+        document.getElementById('themeInput').value = box.getAttribute('data-theme');
+      });
+    });
+    // Image preview
+    document.getElementById('photoInput').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+          const img = document.getElementById('previewImg');
+          img.src = ev.target.result;
+          img.classList.remove('d-none');
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+    // Form submit
+    document.getElementById('ekadForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      fetch('create_kad.php', {
+        method: 'POST',
+        body: formData
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          document.getElementById('result').innerHTML = '<div class="alert alert-success">Kad berjaya dicipta! <a href="' + data.url + '" target="_blank">Lihat Kad Anda</a></div>';
+        } else {
+          document.getElementById('result').innerHTML = '<div class="alert alert-danger">' + (data.error || 'Ralat!') + '</div>';
+        }
+      })
+      .catch(()=>{
+        document.getElementById('result').innerHTML = '<div class="alert alert-danger">Ralat rangkaian!</div>';
+      });
+    });
+  </script>
+</body>
+</html>

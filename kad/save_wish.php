@@ -1,10 +1,10 @@
 <?php
 header('Content-Type: application/json');
-$id = basename(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
-if (!preg_match('/^[a-z0-9]{8}$/', $id)) {
+if (!isset($_GET['id']) || !preg_match('/^[a-z0-9]{8}$/', $_GET['id'])) {
     echo json_encode(['success'=>false,'error'=>'Invalid ID.']);
     exit;
 }
+$id = $_GET['id'];
 $wishFile = __DIR__ . "/$id-wishes.json";
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);

@@ -97,7 +97,7 @@ $themeStyles = [
     }
 
     function loadWishes() {
-      fetch('save_wish.php?<?= $id ?>')
+      fetch('save_wish.php?id=<?= $id ?>')
         .then(res => res.json())
         .then(data => {
           if (data.success) {
@@ -110,7 +110,7 @@ $themeStyles = [
       e.preventDefault();
       var wish = document.getElementById('wishInput').value.trim();
       if (wish.length > 0) {
-        fetch('save_wish.php?<?= $id ?>', {
+        fetch('save_wish.php?id=<?= $id ?>', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ wish: wish })

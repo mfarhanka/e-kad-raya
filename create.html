@@ -81,7 +81,13 @@
       .then(res => res.json())
       .then(data => {
         if (data.success) {
-          document.getElementById('result').innerHTML = '<div class="alert alert-success">Kad berjaya dicipta! <a href="' + data.url + '" target="_blank">Lihat Kad Anda</a></div>';
+          const cardUrl = window.location.origin + '/' + data.url;
+          document.getElementById('result').innerHTML =
+            '<div class="alert alert-success">Kad berjaya dicipta! <a href="' + data.url + '" target="_blank">Lihat Kad Anda</a></div>' +
+            '<div class="text-center mt-3">' +
+              '<img src="qr.png" alt="QR Sokongan" style="width:160px;height:160px;border-radius:1rem;border:2px solid #cfb53b;box-shadow:0 2px 8px #cfb53b33;">' +
+              '<div class="mt-2" style="color:#1b4332;font-weight:bold;">Sokong usaha kami membina platform kad digital ini. Terima kasih!<br><span style="color:#cfb53b;font-weight:normal;">RM10 pun boleh 😊</span></div>' +
+            '</div>';
         } else {
           document.getElementById('result').innerHTML = '<div class="alert alert-danger">' + (data.error || 'Ralat!') + '</div>';
         }
@@ -90,6 +96,22 @@
         document.getElementById('result').innerHTML = '<div class="alert alert-danger">Ralat rangkaian!</div>';
       });
     });
+    // Simple QR code generator (no external library)
+    function generateQR(text) {
+      const canvas = document.getElementById('qrCanvas');
+      if (!canvas) return;
+      // Use Google Chart API for QR (quick, no dependency)
+      const size = 160;
+      const img = new Image();
+      img.src = 'https://chart.googleapis.com/chart?cht=qr&chs=' + size + 'x' + size + '&chl=' + encodeURIComponent(text);
+      img.onload = function() {
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, size, size);
+        ctx.drawImage(img, 0, 0, size, size);
+      };
+    }
   </script>
 </body>
 </html>
